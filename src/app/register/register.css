@@ -1,0 +1,278 @@
+/* ==================================================================
+   /register — entrance experience
+   Pure-CSS timeline so the intro plays before JavaScript loads.
+   JS only adds "skip" (data-intro="off") and view transitions.
+   ================================================================== */
+
+.kc-stage {
+  --intro: 2.75s;
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ease-io: cubic-bezier(0.77, 0, 0.18, 1);
+}
+.kc-stage[data-intro="off"] {
+  --intro: 0s;
+}
+
+/* ── film grain + ambient glow ─────────────────────────────────── */
+.kc-grain::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  pointer-events: none;
+  opacity: 0.05;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+[data-theme="light"] .kc-grain::after {
+  opacity: 0.035;
+  mix-blend-mode: multiply;
+}
+
+.kc-glow {
+  background: radial-gradient(closest-side, rgb(242 163 58 / 0.16), transparent);
+  filter: blur(40px);
+}
+[data-theme="light"] .kc-glow {
+  background: radial-gradient(closest-side, rgb(242 163 58 / 0.22), transparent);
+}
+
+/* ── intro overlay ─────────────────────────────────────────────── */
+.kc-intro {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  background: var(--color-ink);
+  clip-path: inset(0 0 0 0);
+  animation: kc-intro-out 0.95s var(--ease-io) 2.45s forwards;
+}
+@keyframes kc-intro-out {
+  to {
+    clip-path: inset(0 0 100% 0);
+    visibility: hidden;
+  }
+}
+
+.kc-intro__logo {
+  position: relative;
+  width: min(560px, 76vw);
+  aspect-ratio: 1163 / 221;
+  animation: kc-logo-out 0.6s ease-in 2.25s forwards;
+}
+@keyframes kc-logo-out {
+  to {
+    opacity: 0;
+    transform: translateY(-32px) scale(0.98);
+  }
+}
+
+.kc-intro__mark {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 20.9%;
+  height: 100%;
+  animation: kc-mark 1.05s var(--ease-out) 0.15s both;
+}
+@keyframes kc-mark {
+  from {
+    opacity: 0;
+    transform: scale(0.55) rotate(-14deg);
+    filter: blur(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: blur(0);
+  }
+}
+
+.kc-intro__ring {
+  position: absolute;
+  left: 10.45%;
+  top: 50%;
+  width: 26%;
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  border: 1px solid var(--color-amber);
+  border-radius: 9999px;
+  opacity: 0;
+  animation: kc-ring 1.4s var(--ease-out) 0.45s both;
+}
+@keyframes kc-ring {
+  from {
+    opacity: 0.9;
+    transform: scale(0.35);
+  }
+  to {
+    opacity: 0;
+    transform: scale(2.4);
+  }
+}
+
+.kc-intro__word {
+  position: absolute;
+  left: 23.04%;
+  top: 23.98%;
+  width: 76.96%;
+  animation: kc-wipe 1.05s var(--ease-io) 0.7s both;
+}
+@keyframes kc-wipe {
+  from {
+    clip-path: inset(0 100% 0 0);
+    transform: translateX(-16px);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+    transform: none;
+  }
+}
+
+.kc-intro__tag {
+  position: absolute;
+  left: 23.04%;
+  top: 80.54%;
+  width: 76.7%;
+  animation: kc-tag 0.85s var(--ease-out) 1.4s both;
+}
+@keyframes kc-tag {
+  from {
+    opacity: 0;
+    clip-path: inset(0 50% 0 50%);
+  }
+  to {
+    opacity: 1;
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+.kc-intro__bar {
+  width: min(560px, 76vw);
+  height: 1px;
+  margin-top: 3.5rem;
+  overflow: hidden;
+  background: var(--color-line-strong);
+}
+.kc-intro__bar::after {
+  content: "";
+  display: block;
+  height: 100%;
+  background: var(--color-amber);
+  transform-origin: left;
+  animation: kc-bar 2.2s cubic-bezier(0.6, 0, 0.2, 1) both;
+}
+@keyframes kc-bar {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.kc-intro__meta {
+  animation: kc-fade 0.6s ease-out 0.3s both;
+}
+@keyframes kc-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+/* ── staged reveals after the intro ────────────────────────────── */
+.rv {
+  animation: kc-rv 1s var(--ease-out) both;
+  animation-delay: calc(var(--intro) + var(--d, 0s));
+}
+.kc-stage[data-intro="off"] .rv {
+  animation-name: kc-rv-b;
+}
+@keyframes kc-rv {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes kc-rv-b {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.rv-panel {
+  animation: kc-panel 1.15s var(--ease-io) both;
+  animation-delay: calc(var(--intro) + var(--d, 0s));
+}
+.kc-stage[data-intro="off"] .rv-panel {
+  animation-name: kc-panel-b;
+}
+@keyframes kc-panel {
+  from {
+    clip-path: inset(100% 0 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+@keyframes kc-panel-b {
+  from {
+    clip-path: inset(100% 0 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+/* form view entrance (no intro delay) */
+.fv {
+  animation: kc-rv-b 0.9s var(--ease-out) both;
+  animation-delay: var(--d, 0s);
+}
+
+/* ── option panels ─────────────────────────────────────────────── */
+.kc-panel {
+  --x: 50%;
+  --y: 50%;
+}
+.kc-panel__spot {
+  background: radial-gradient(420px circle at var(--x) var(--y), rgb(242 163 58 / 0.22), transparent 60%);
+}
+
+/* ── view transitions (card photo morphs into the form page) ───── */
+::view-transition-group(*) {
+  animation-duration: 0.75s;
+  animation-timing-function: cubic-bezier(0.7, 0, 0.2, 1);
+}
+::view-transition-old(*),
+::view-transition-new(*) {
+  height: 100%;
+  object-fit: cover;
+  overflow: clip;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kc-intro {
+    display: none;
+  }
+  .rv,
+  .rv-panel,
+  .fv {
+    animation: none !important;
+  }
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}

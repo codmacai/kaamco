@@ -1,0 +1,200 @@
+@import "tailwindcss";
+
+/* `light:` variant — active when <html data-theme="light"> */
+@custom-variant light (&:where([data-theme="light"], [data-theme="light"] *));
+
+/* ------------------------------------------------------------------
+   KAAM-CO design tokens
+   Brand: navy #1B3A5E · slate #303A44 · sky #8FB0DA · amber #F2A33A
+
+   Themed tokens (swap between dark & bright):
+     ink / ink-2 / ink-3  canvas → raised panels
+     fg / fg-2 / fg-3     text, strong → muted
+     line / line-strong   hairlines
+     accent               amber used as TEXT (deepened in bright mode for contrast)
+   Fixed tokens (never swap — used on top of photos):
+     night, snow
+------------------------------------------------------------------- */
+@theme {
+  --color-ink: #070e17;
+  --color-ink-2: #0b1622;
+  --color-ink-3: #102033;
+  --color-fg: #f2f5f9;
+  --color-fg-2: #a3b2c5;
+  --color-fg-3: #6c7d92;
+  --color-line: rgb(143 176 218 / 0.14);
+  --color-line-strong: rgb(143 176 218 / 0.28);
+  --color-outline: rgb(143 176 218 / 0.32);
+  --color-accent: #f2a33a;
+  --color-sky: #8fb0da;
+
+  --color-navy: #1b3a5e;
+  --color-slate: #303a44;
+  --color-amber: #f2a33a;
+  --color-amber-deep: #d98a22;
+  --color-night: #070e17;
+  --color-snow: #f2f5f9;
+
+  --spacing-rail: 15rem;
+
+  --animate-marquee: marquee 40s linear infinite;
+
+  @keyframes marquee {
+    to {
+      transform: translateX(-50%);
+    }
+  }
+}
+
+@theme inline {
+  --font-sans: var(--font-inter), var(--font-mukta), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-montserrat), var(--font-mukta), var(--font-inter), ui-sans-serif, sans-serif;
+  --font-hindi: var(--font-mukta), var(--font-inter), sans-serif;
+}
+
+/* Bright version */
+:root[data-theme="light"] {
+  color-scheme: light;
+  --color-ink: #f3f5f8;
+  --color-ink-2: #ffffff;
+  --color-ink-3: #e3e9f0;
+  --color-fg: #0f2236;
+  --color-fg-2: #4a5c71;
+  --color-fg-3: #7b8b9e;
+  --color-line: rgb(27 58 94 / 0.12);
+  --color-line-strong: rgb(27 58 94 / 0.24);
+  --color-outline: rgb(27 58 94 / 0.2);
+  --color-accent: #b46c0d;
+  --color-sky: #3a6294;
+}
+
+@layer base {
+  html {
+    color-scheme: dark;
+    scroll-behavior: smooth;
+    scroll-padding-top: 5rem;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background: var(--color-ink);
+    color: var(--color-fg);
+    font-family: var(--font-sans);
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background: var(--color-amber);
+    color: var(--color-night);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-amber);
+    outline-offset: 2px;
+  }
+
+  [lang="hi"] {
+    font-family: var(--font-hindi);
+  }
+}
+
+@layer components {
+  /* centered frame with hairline side rules */
+  .frame {
+    margin-inline: auto;
+    width: 100%;
+    max-width: 90rem;
+    border-inline: 1px solid var(--color-line);
+  }
+
+  /* micro label — uppercase, wide tracking */
+  .eyebrow {
+    font-family: var(--font-display);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    line-height: 1.4;
+  }
+
+  /* large light uppercase display type */
+  .display {
+    font-family: var(--font-display);
+    font-weight: 300;
+    text-transform: uppercase;
+    letter-spacing: -0.02em;
+    line-height: 0.95;
+  }
+
+  /* form fields */
+  .field {
+    width: 100%;
+    border: 1px solid var(--color-line-strong);
+    background: color-mix(in srgb, var(--color-ink) 60%, transparent);
+    padding: 0.75rem 0.875rem;
+    font-size: 0.9375rem;
+    color: var(--color-fg);
+    border-radius: 0;
+    transition: border-color 0.15s;
+  }
+  .field::placeholder {
+    color: var(--color-fg-3);
+  }
+  .field:hover {
+    border-color: color-mix(in srgb, var(--color-sky) 55%, transparent);
+  }
+  .field:focus {
+    border-color: var(--color-amber);
+    outline: none;
+  }
+  select.field {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%238FB0DA' stroke-width='1.5'%3E%3Cpath d='m2 4 4 4 4-4'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.875rem center;
+    padding-right: 2.25rem;
+  }
+
+  /* full-bleed hero photo: fades into the canvas on the left and bottom */
+  .hero-photo {
+    -webkit-mask-image:
+      linear-gradient(to right, transparent 0%, #000 32%),
+      linear-gradient(to bottom, #000 70%, transparent 100%);
+    -webkit-mask-composite: source-in;
+    mask-image:
+      linear-gradient(to right, transparent 0%, #000 32%),
+      linear-gradient(to bottom, #000 70%, transparent 100%);
+    mask-composite: intersect;
+  }
+  @media (max-width: 1023px) {
+    .hero-photo {
+      -webkit-mask-image: linear-gradient(to bottom, #000 45%, transparent 100%);
+      mask-image: linear-gradient(to bottom, #000 45%, transparent 100%);
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ── Hindi (Devanagari) tuning: matras need taller lines; no wide tracking ── */
+[lang="hi"] .display {
+  line-height: 1.12 !important;
+  letter-spacing: 0 !important;
+}
+[lang="hi"] .eyebrow {
+  letter-spacing: 0.02em;
+}
+[lang="hi"] :is(h1, h2, h3, p, span, a, label, li) {
+  word-break: normal;
+}

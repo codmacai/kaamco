@@ -1,5 +1,5 @@
 import { dict, type Lang } from "@/content/i18n";
-import { cities, site } from "@/content/site";
+import { site } from "@/content/site";
 import About from "./About";
 import Contact from "./Contact";
 import Faq from "./Faq";
@@ -24,14 +24,14 @@ export default function HomePage({ lang }: { lang: Lang }) {
         url: site.url,
         logo: `${site.url}/icon.png`,
         description: site.description,
-        areaServed: cities.map((c) => ({ "@type": "City", name: c.name })),
-        contactPoint: [site.contact.clients, site.contact.workers].map((c) => ({
+        areaServed: { "@type": "City", name: site.city },
+        contactPoint: {
           "@type": "ContactPoint",
-          telephone: c.phone.replace(/\s/g, ""),
-          contactType: c.label,
+          telephone: site.contact.phone.replace(/\s/g, ""),
+          contactType: "customer service",
           areaServed: "IN",
           availableLanguage: ["English", "Hindi"],
-        })),
+        },
       },
       {
         "@type": "Service",
@@ -59,7 +59,7 @@ export default function HomePage({ lang }: { lang: Lang }) {
   };
 
   return (
-    <div lang={lang === "hi" ? "hi" : undefined}>
+    <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}
@@ -75,6 +75,6 @@ export default function HomePage({ lang }: { lang: Lang }) {
       </main>
       <Footer lang={lang} />
       <MobileCta lang={lang} />
-    </div>
+    </>
   );
 }

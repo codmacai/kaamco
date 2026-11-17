@@ -110,6 +110,11 @@ export default function FormView({ lang, path, onBack }: { lang: Lang; path: Reg
             {path.formSub}
           </p>
         )}
+        {path.formIntro && (
+          <p className="fv mt-4 max-w-xl text-[0.9375rem] leading-relaxed text-fg-2" style={delay(0.34)}>
+            {path.formIntro}
+          </p>
+        )}
 
         <div className="fv mt-10 border border-line bg-ink-2 p-5 sm:p-8 lg:p-10" style={delay(0.38)}>
           {path.key === "company" && <CompanyForm key={`c${nonce}`} lang={lang} onReset={reset} />}
@@ -125,10 +130,6 @@ export default function FormView({ lang, path, onBack }: { lang: Lang; path: Reg
             </li>
           ))}
         </ol>
-
-        <p className="fv mt-8 max-w-xl text-xs leading-relaxed text-fg-3" style={delay(0.44)}>
-          {t.privacy}
-        </p>
       </section>
     </main>
   );

@@ -89,18 +89,6 @@ export default function RegisterExperience({ lang }: { lang: Lang }) {
     }
   }, [show]);
 
-  // Keyboard shortcuts 1 / 2 / 3 on the chooser.
-  useEffect(() => {
-    if (intro || view !== "choose") return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.metaKey || e.ctrlKey || e.altKey) return;
-      const i = ["1", "2", "3"].indexOf(e.key);
-      if (i >= 0) choose(PATHS[i].key);
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [intro, view, choose]);
-
   const path = view === "choose" ? null : getPaths(lang).find((p) => p.key === view)!;
 
   return (

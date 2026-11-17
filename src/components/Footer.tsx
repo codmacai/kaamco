@@ -1,17 +1,23 @@
 import Link from "next/link";
 import { dict, lp, type Lang } from "@/content/i18n";
-import { legalPages, site } from "@/content/site";
+import { legalPages, servicePages, site } from "@/content/site";
 import Logo from "./Logo";
 
 export default function Footer({ lang }: { lang: Lang }) {
   const t = dict[lang];
   return (
-    <footer className="relative overflow-hidden pb-20 lg:pb-0">
-      <div className="frame grid gap-10 border-b border-line px-5 py-12 sm:px-8 md:grid-cols-[1.4fr_1fr_1fr] lg:px-12 lg:py-16">
+    <footer className="relative overflow-hidden pb-20 xl:pb-0">
+      <div className="frame grid gap-10 border-b border-line px-5 py-12 sm:px-8 md:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr] lg:px-12 lg:py-16">
         <div>
           <Logo className="h-10" />
-          <p className="mt-5 max-w-xs text-sm leading-relaxed text-fg-2">
+          <p className="mt-5 max-w-xs text-[0.9375rem] leading-relaxed text-fg-2">
             {t.footer.blurb}
+          </p>
+          <p className="mt-4 text-sm text-fg-2">
+            {site.city}, {site.region} ·{" "}
+            <a href={`tel:${site.contact.phone.replace(/\s/g, "")}`} className="font-semibold text-fg hover:text-accent">
+              {site.contact.phone}
+            </a>
           </p>
         </div>
         <nav aria-label="Footer">
@@ -19,8 +25,23 @@ export default function Footer({ lang }: { lang: Lang }) {
           <ul className="mt-4 grid gap-2.5">
             {t.nav.map((n) => (
               <li key={n.href}>
-                <Link href={lp(`/${n.href}`, lang)} className="text-sm text-fg-2 hover:text-fg">
+                <Link href={lp(n.href, lang)} className="text-sm text-fg-2 hover:text-fg">
                   {n.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
+        <nav aria-label={t.footer.services}>
+          <p className="eyebrow text-fg-3">{t.footer.services}</p>
+          <ul className="mt-4 grid gap-2.5">
+            {servicePages.map((p, i) => (
+              <li key={p.slug}>
+                <Link
+                  href={lang === "en" ? `/services/${p.slug}` : lp(`/register?category=${encodeURIComponent(p.category)}#need-manpower`, lang)}
+                  className="text-sm text-fg-2 hover:text-fg"
+                >
+                  {t.services.items[i].title}
                 </Link>
               </li>
             ))}

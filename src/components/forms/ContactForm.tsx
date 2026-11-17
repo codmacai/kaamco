@@ -1,46 +1,47 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useState } from "react";
 import { ArrowRight } from "lucide-react";
-import { submitLead, type LeadState } from "@/app/actions";
 import { dict, type Lang } from "@/content/i18n";
-import { Honeypot, Input, Textarea, mobileProps } from "./fields";
-import { Success } from "./LeadForms";
-
-const initial: LeadState = { status: "idle" };
+import { Consent, FormLang, Honeypot, Input, Textarea, mobileProps } from "./fields";
+import { Success, useLeadSubmit } from "./LeadForms";
 
 function Form({ lang, onReset }: { lang: Lang; onReset: () => void }) {
   const d = dict[lang].form;
   const t = d.contact;
-  const [state, action, pending] = useActionState(submitLead, initial);
+  const { state, pending, onSubmit, onFirstInput } = useLeadSubmit("contact", lang);
   const e = state.errors ?? {};
 
-  if (state.status === "success") return <Success state={state} onReset={onReset} lang={lang} />;
+  if (state.status === "success") return <Success state={state} onReset={onReset} lang={lang} type="contact" />;
 
   return (
-    <form action={action} className="relative grid gap-5 sm:grid-cols-2">
-      <input type="hidden" name="type" value="contact" />
-      <input type="hidden" name="lang" value={lang} />
-      <Honeypot />
-      <Input name="name" label={t.name} autoComplete="name" required error={e.name} />
-      <Input {...mobileProps(d)} label={d.mobile} error={e.mobile} />
-      <Textarea name="message" label={t.message} required error={e.message} className="sm:col-span-2" />
-      {state.status === "error" && state.message && (
-        <p role="alert" className="text-sm text-accent sm:col-span-2">
-          {state.message}
-        </p>
-      )}
-      <div className="sm:col-span-2">
-        <button
-          type="submit"
-          disabled={pending}
-          className="inline-flex h-12 items-center gap-3 bg-fg px-6 text-sm font-bold text-ink transition-colors hover:bg-amber hover:text-night disabled:opacity-60"
-        >
-          {pending ? t.sending : t.submit}
-          {!pending && <ArrowRight aria-hidden className="size-4" />}
-        </button>
-      </div>
-    </form>
+    <FormLang.Provider value={lang}>
+      <form onSubmit={onSubmit} onInput={onFirstInput} className="relative grid gap-5 sm:grid-cols-2">
+        <Honeypot />
+        <Input name="name" label={t.name} autoComplete="name" maxLength={80} required error={e.name} />
+        <Input {...mobileProps(d)} label={d.mobile} error={e.mobile} />
+        <Textarea name="message" label={t.message} required error={e.message} className="sm:col-span-2" />
+        <div className="sm:col-span-2">
+          <Consent error={e.consent} />
+        </div>
+        {state.status === "error" && state.message && (
+          <p role="alert" className="border-l-2 border-[#b42318] bg-[#b42318]/8 px-4 py-3 text-[0.9375rem] text-fg sm:col-span-2">
+            {state.message}
+          </p>
+        )}
+        <div className="sm:col-span-2">
+          <button
+            type="submit"
+            disabled={pending}
+            aria-busy={pending}
+            className="inline-flex min-h-12 items-center justify-center gap-3 bg-fg px-6 text-[0.9375rem] font-bold text-ink transition-colors hover:bg-amber hover:text-night disabled:opacity-60 max-sm:w-full"
+          >
+            {pending ? d.submitting : t.submit}
+            {!pending && <ArrowRight aria-hidden className="size-4" />}
+          </button>
+        </div>
+      </form>
+    </FormLang.Provider>
   );
 }
 

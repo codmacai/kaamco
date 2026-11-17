@@ -7,6 +7,10 @@
  *   Supply     ← "I Want to Supply Manpower"
  *   Enquiries  ← contact form
  *
+ * Each row also carries the lead-tracking columns the team fills in:
+ *   Stage (new → contacted → qualified → matching → converted / closed), Verification, Owner,
+ *   Next follow-up, Outcome, Team notes. Restrict Sheet access: the Manpower tab holds confidential budgets.
+ *
  * Setup: see README.md → "Google Sheets".
  */
 
@@ -41,6 +45,20 @@ function doPost(e) {
     const ss = SpreadsheetApp.getActiveSpreadsheet();
     const sheet = ss.getSheetByName(body.sheet) || ss.insertSheet(body.sheet);
     const row = body.row || {};
+
+    // Duplicate detection (spec §05): same mobile already in this tab → flag, don't merge.
+    if (row.Mobile && sheet.getLastRow() > 1) {
+      const head = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+      const mCol = head.indexOf("Mobile");
+      const rCol = head.indexOf("Reference ID");
+      if (mCol > -1 && rCol > -1) {
+        const data = sheet.getRange(2, 1, sheet.getLastRow() - 1, sheet.getLastColumn()).getValues();
+        const matches = data
+          .filter(function (r) { return String(r[mCol]).replace(/\D/g, "").slice(-10) === String(row.Mobile).replace(/\D/g, "").slice(-10); })
+          .map(function (r) { return r[rCol]; });
+        if (matches.length) row["Possible duplicate of"] = matches.slice(-3).join(", ");
+      }
+    }
 
     // Grow the header row when a form sends a new field.
     const headers = sheet.getLastColumn() ? sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0] : [];

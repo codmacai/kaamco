@@ -188,13 +188,13 @@
 }
 
 /* ── Hindi (Devanagari) tuning: matras need taller lines; no wide tracking ── */
-[lang="hi"] .display {
+.display:lang(hi) {
   line-height: 1.12 !important;
   letter-spacing: 0 !important;
 }
-[lang="hi"] .eyebrow {
+.eyebrow:lang(hi) {
   letter-spacing: 0.02em;
 }
-[lang="hi"] :is(h1, h2, h3, p, span, a, label, li) {
+:is(h1, h2, h3, p, span, a, label, li):lang(hi) {
   word-break: normal;
 }

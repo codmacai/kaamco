@@ -276,3 +276,8 @@
     animation: none !important;
   }
 }
+
+/* Deep links (#need-manpower, #find-work, #supply-manpower) open the form directly: no intro flash. */
+.kc-deep .kc-intro {
+  display: none;
+}

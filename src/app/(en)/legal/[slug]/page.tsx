@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import Logo from "@/components/Logo";
 import Footer from "@/components/Footer";
-import { legalPages, type LegalSlug } from "@/content/site";
+import { legalPages, site, type LegalSlug } from "@/content/site";
 
 export function generateStaticParams() {
   return Object.keys(legalPages).map((slug) => ({ slug }));
@@ -13,7 +13,8 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: PageProps<"/legal/[slug]">): Promise<Metadata> {
   const { slug } = await params;
   const title = legalPages[slug as LegalSlug];
-  return title ? { title, alternates: { canonical: `/legal/${slug}` } } : {};
+  // Not indexed until KAAM-CO publishes the counsel-approved text (spec §09, QA-10).
+  return title ? { title, alternates: { canonical: `/legal/${slug}` }, robots: { index: false, follow: true } } : {};
 }
 
 export default async function LegalPage({ params }: PageProps<"/legal/[slug]">) {
@@ -39,8 +40,8 @@ export default async function LegalPage({ params }: PageProps<"/legal/[slug]">) 
         <p className="eyebrow text-accent">Legal</p>
         <h1 className="display mt-4 text-[clamp(2.5rem,5vw,4.5rem)]">{title}</h1>
         <p className="mt-8 max-w-xl text-fg-2">
-          KAAM-CO will publish the full {title.toLowerCase()} before launch. For questions in the
-          meantime, please reach us through the contact form on the home page.
+          This {title.toLowerCase()} is being finalised and reviewed before publication. Until it is published, KAAM-CO
+          uses the details you submit only to contact you about your request. For questions, call {site.contact.phone}.
         </p>
       </main>
       <Footer lang="en" />

@@ -4,6 +4,7 @@ import type { CSSProperties, PointerEvent } from "react";
 import Image from "next/image";
 import { ArrowUpRight } from "lucide-react";
 import { dict, type Lang } from "@/content/i18n";
+import { track as trackEvent } from "@/lib/track";
 import { getPaths, type PathKey } from "./paths";
 
 const delay = (s: number) => ({ "--d": `${s}s` }) as CSSProperties;
@@ -24,63 +25,64 @@ export default function Chooser({
   onChoose: (k: PathKey) => void;
   as?: "main" | "section";
 }) {
-  const t = dict[lang].chooser;
+  const t = dict[lang].hero;
+  const services = dict[lang].services.items;
   const paths = getPaths(lang);
   return (
     <Tag
       id={Tag === "main" ? "main" : "top"}
-      className="relative flex flex-col lg:h-[calc(100svh-5rem)] lg:min-h-[46rem]"
+      aria-labelledby="hero-title"
+      className="relative flex flex-col lg:min-h-[calc(100svh-5rem)]"
     >
       <div aria-hidden className="kc-glow pointer-events-none absolute -top-40 left-[8%] size-[36rem]" />
 
-      <div className="relative flex flex-col gap-6 px-5 pb-8 pt-10 sm:px-8 lg:flex-row lg:items-end lg:justify-between lg:px-10 lg:pb-10 lg:pt-14">
+      <div className="relative grid gap-6 px-5 pb-8 pt-10 sm:px-8 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)] lg:items-end lg:gap-12 lg:px-10 lg:pb-10 lg:pt-12">
         <div>
           <p className="rv eyebrow text-accent" style={delay(0)}>
-            {t.step} <span className="mx-2 text-fg-3">/</span>
-            <span className="text-fg-2">{t.choose}</span>
+            {t.eyebrow}
           </p>
           <h1
-            className="rv display mt-5 text-[clamp(2.75rem,6vw,6rem)] leading-[0.92] text-fg"
+            id="hero-title"
+            className="rv display mt-5 text-[clamp(2.25rem,4.2vw,4.5rem)] leading-[0.98] text-fg"
             style={delay(0.08)}
           >
             {t.title[0]}
             <br />
             {t.title[1]}
           </h1>
-          <p lang={t.subLang} className="rv mt-4 text-xl text-sky" style={delay(0.16)}>
-            {t.sub}
+          <p className="rv mt-5 max-w-xl text-lg leading-relaxed text-fg-2" style={delay(0.16)}>
+            {t.lead}
           </p>
         </div>
 
-        <div className="rv hidden flex-col items-end gap-3 text-right lg:flex" style={delay(0.24)}>
-          <p className="text-sm text-fg-2">{t.meta}</p>
-          <p className="flex items-center gap-2 text-xs text-fg-3">
-            {t.press}
-            {["1", "2", "3"].map((k) => (
-              <kbd
-                key={k}
-                className="grid size-6 place-items-center border border-line-strong font-sans text-[0.6875rem] text-fg-2"
-              >
-                {k}
-              </kbd>
+        <div className="rv flex flex-col gap-4 lg:items-start" style={delay(0.24)}>
+          <ul className="flex flex-wrap gap-2" aria-label={dict[lang].services.label}>
+            {services.map((s) => (
+              <li key={s.title} className="border border-line-strong bg-ink px-3 py-1.5 text-[0.875rem] font-medium text-fg">
+                {s.title}
+              </li>
             ))}
-            {t.toChoose}
-          </p>
+          </ul>
+          <p className="max-w-md text-[0.9375rem] leading-relaxed text-fg-2">{t.meta}</p>
         </div>
       </div>
 
+      <h2 className="sr-only">{t.cardsLabel}</h2>
       <ul className="group/list flex flex-1 flex-col gap-3 px-5 pb-5 sm:px-8 lg:flex-row lg:px-10 lg:pb-8">
         {paths.map((p, i) => (
           <li
             key={p.key}
-            className="rv-panel flex min-h-60 transition-[flex-grow] duration-700 ease-[cubic-bezier(0.7,0,0.2,1)] sm:min-h-72 lg:min-h-0 lg:flex-1 lg:hover:grow-[1.65] lg:has-[:focus-visible]:grow-[1.65]"
+            className="rv-panel flex min-h-72 transition-[flex-grow] duration-700 ease-[cubic-bezier(0.7,0,0.2,1)] lg:min-h-[24rem] lg:flex-1 lg:hover:grow-[1.65] lg:has-[:focus-visible]:grow-[1.65]"
             style={delay(0.25 + i * 0.12)}
           >
             <button
               type="button"
-              onClick={() => onChoose(p.key)}
+              onClick={() => {
+                trackEvent("cta_click", { audience: p.key });
+                onChoose(p.key);
+              }}
               onPointerMove={track}
-              aria-label={`${p.title}${p.sub ? ` (${p.sub})` : ""} — ${p.audience}`}
+              aria-label={`${p.audience}: ${p.cta}`}
               className="kc-panel group relative flex w-full overflow-hidden bg-night text-left outline-offset-4"
             >
               {/* photo — named so it morphs into the form page */}
@@ -104,10 +106,11 @@ export default function Chooser({
 
               <span className="relative z-10 flex w-full flex-col justify-between gap-10 p-6 lg:p-8">
                 <span className="flex items-start justify-between gap-4">
-                  <span className="eyebrow text-snow/70">
+                  <span className="eyebrow text-snow/80">
                     <span className="text-amber">{p.n}</span>
                     <span className="mx-2 text-snow/40">/</span>
                     {p.audience}
+                    <span className="ml-3 normal-case tracking-normal text-snow/60">· {p.tag}</span>
                   </span>
                   <span className="grid size-11 shrink-0 place-items-center border border-white/25 text-snow transition-all duration-500 group-hover:rotate-45 group-hover:border-amber group-hover:bg-amber group-hover:text-night">
                     <ArrowUpRight aria-hidden className="size-5" />
@@ -115,7 +118,7 @@ export default function Chooser({
                 </span>
 
                 <span className="block">
-                  <span className="display block text-[clamp(2rem,3.2vw,3.4rem)] leading-[0.95] text-snow">
+                  <span className="display block text-[clamp(2rem,3vw,3rem)] leading-[0.98] text-snow">
                     {p.title}
                   </span>
                   {p.sub && (
@@ -123,17 +126,12 @@ export default function Chooser({
                       {p.sub}
                     </span>
                   )}
-                  <span className="mt-4 block max-w-sm text-sm leading-relaxed text-snow/75 transition-all duration-500 lg:max-h-0 lg:translate-y-2 lg:overflow-hidden lg:opacity-0 lg:group-hover:max-h-32 lg:group-hover:translate-y-0 lg:group-hover:opacity-100 lg:group-focus-visible:max-h-32 lg:group-focus-visible:opacity-100">
+                  <span className="mt-3 block max-w-sm text-[0.9375rem] leading-relaxed text-snow/85">
                     {p.text}
                   </span>
                   <span className="mt-6 flex flex-wrap items-center gap-4">
-                    <span
-                      className="border border-white/20 bg-night/30 px-3 py-1.5 text-xs text-snow/80 backdrop-blur-sm"
-                    >
-                      {p.tag}
-                    </span>
-                    <span className="text-sm font-semibold text-snow underline-offset-4 group-hover:underline">
-                      {t.continue}
+                    <span className="inline-flex min-h-11 items-center bg-amber px-4 text-[0.9375rem] font-bold text-night">
+                      {p.cta}
                     </span>
                   </span>
                 </span>

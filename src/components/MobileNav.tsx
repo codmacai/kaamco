@@ -20,7 +20,7 @@ export default function MobileNav({ lang }: { lang: Lang }) {
   }, [open]);
 
   return (
-    <div className="lg:hidden">
+    <div className="xl:hidden">
       <button
         type="button"
         aria-expanded={open}
@@ -41,12 +41,12 @@ export default function MobileNav({ lang }: { lang: Lang }) {
             {t.nav.map((item, i) => (
               <a
                 key={item.href}
-                href={item.href}
+                href={lp(item.href, lang)}
                 onClick={() => setOpen(false)}
                 className="flex items-baseline gap-4 border-b border-line px-6 py-5"
               >
                 <span className="eyebrow text-fg-3">{String(i + 1).padStart(2, "0")}</span>
-                <span className="display text-3xl">{item.label}</span>
+                <span className="display text-2xl">{item.label}</span>
               </a>
             ))}
           </nav>
@@ -63,12 +63,16 @@ export default function MobileNav({ lang }: { lang: Lang }) {
               onClick={() => setOpen(false)}
               className="flex h-12 items-center justify-between bg-ink-3 px-5 font-semibold"
             >
-              {t.header.findWork}
-              {t.header.findWorkSub && (
-                <span lang="hi" className="text-sm font-normal text-sky">
-                  {t.header.findWorkSub}
-                </span>
-              )}
+              {t.paths.worker.cta}
+              <ArrowUpRight className="size-5" />
+            </a>
+            <a
+              href={lp("/register#supply-manpower", lang)}
+              onClick={() => setOpen(false)}
+              className="flex h-12 items-center justify-between border border-line-strong px-5 font-semibold"
+            >
+              {t.paths.supplier.cta}
+              <ArrowUpRight className="size-5" />
             </a>
           </div>
         </div>
